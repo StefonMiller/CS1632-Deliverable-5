@@ -1,7 +1,12 @@
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Random;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import gov.nasa.jpf.vm.Verify;
 
 /**
  * Code by @author Wonsun Ahn
@@ -38,6 +43,9 @@ public class BeanCounterLogicTest {
 			 * how to use the Verify API, look at:
 			 * https://github.com/javapathfinder/jpf-core/wiki/Verify-API-of-JPF
 			 */
+			slotCount = Verify.getInt(1, 5);
+			beanCount = Verify.getInt(0, 3);
+			isLuck = Verify.getBoolean();
 		} else {
 			assert (false);
 		}
@@ -89,6 +97,49 @@ public class BeanCounterLogicTest {
 		 * 
 		 * PLEASE REMOVE when you are done implementing.
 		 */
+		logic.reset(beans);
+		
+		//Counter for in-flight beans 
+		int inFlightCount = 0;
+		if(beanCount > 0)
+		{
+			//Ensure remaining beans are beanCount - 1
+			assertEquals("Remaining bean count is not beanCount - 1", beanCount - 1, logic.getRemainingBeanCount());
+			//Loop through slots
+			for(int i = 0; i < slotCount; i++)
+			{
+				//Each additional slot is another y level, so the number of levels is equal to the number of slots.
+				//If there is an in flight bean for the given X position, increment the counter
+				if(logic.getInFlightBeanXPos(i) != -1)
+				{
+					inFlightCount++;
+				}
+				//Ensure there are no beans in any slots
+				assertEquals("No beans should be in any slots but there are", 0, logic.getSlotBeanCount(i));
+			}
+			//Ensure there is only 1 bean in flight
+			assertEquals("In flight bean count should be 1 but is not", 1, inFlightCount);
+		}
+		else if(beanCount == 0)
+		{
+			//Ensure there are no remaining beans
+			assertEquals("Remaining bean count is not 0", 0, logic.getRemainingBeanCount());
+			//Loop through slots
+			for(int i = 0; i < slotCount; i++)
+			{
+				//Each additional slot is another y level, so the number of levels is equal to the number of slots.
+				//If there is an in flight bean for the given X position, increment the counter
+				if(logic.getInFlightBeanXPos(i) != -1)
+				{
+					inFlightCount++;
+				}
+				//Ensure there are no beans in any slots
+				assertEquals("No beans should be in any slots but there are", 0, logic.getSlotBeanCount(i));
+			}
+			//Ensure there are no beans in flight
+			assertEquals("In flight bean count should be 0 but is not", 0, inFlightCount);
+		}
+		
 		System.out.println(failString);
 	}
 
@@ -103,6 +154,22 @@ public class BeanCounterLogicTest {
 	@Test
 	public void testAdvanceStepCoordinates() {
 		// TODO: Implement
+		logic.reset(beans);
+		boolean done = logic.advanceStep();
+		while(!done)
+		{
+			done = logic.advanceStep();
+			for(int i = 0; i < slotCount; i++)
+			{
+				int inFlightBeanXPos = logic.getInFlightBeanXPos(i);
+				if(inFlightBeanXPos != -1)
+				{
+					//Ensure each bean at every X position is within the bounds of the slots
+					assertTrue("In-flight bean too far to the right", inFlightBeanXPos < slotCount);
+					assertTrue("In-flight bean too far to the left", inFlightBeanXPos >= 0);
+				}
+			}
+		}
 	}
 
 	/**

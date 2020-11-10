@@ -28,7 +28,8 @@ import java.util.Random;
 
 public class BeanCounterLogicImpl implements BeanCounterLogic {
 	// TODO: Add member methods and variables as needed
-
+	
+	
 	/**
 	 * Constructor - creates the bean counter logic object that implements the core
 	 * logic with the provided number of slots.
