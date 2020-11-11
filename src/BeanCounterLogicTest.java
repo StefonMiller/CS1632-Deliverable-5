@@ -105,6 +105,7 @@ public class BeanCounterLogicTest {
 		{
 			//Ensure remaining beans are beanCount - 1
 			assertEquals("Remaining bean count is not beanCount - 1", beanCount - 1, logic.getRemainingBeanCount());
+			
 			//Loop through slots
 			for(int i = 0; i < slotCount; i++)
 			{
@@ -114,16 +115,20 @@ public class BeanCounterLogicTest {
 				{
 					inFlightCount++;
 				}
+				
 				//Ensure there are no beans in any slots
 				assertEquals("No beans should be in any slots but there are", 0, logic.getSlotBeanCount(i));
 			}
+			
 			//Ensure there is only 1 bean in flight
 			assertEquals("In flight bean count should be 1 but is not", 1, inFlightCount);
 		}
+		
 		else if(beanCount == 0)
 		{
 			//Ensure there are no remaining beans
 			assertEquals("Remaining bean count is not 0", 0, logic.getRemainingBeanCount());
+			
 			//Loop through slots
 			for(int i = 0; i < slotCount; i++)
 			{
@@ -133,9 +138,11 @@ public class BeanCounterLogicTest {
 				{
 					inFlightCount++;
 				}
+				
 				//Ensure there are no beans in any slots
 				assertEquals("No beans should be in any slots but there are", 0, logic.getSlotBeanCount(i));
 			}
+			
 			//Ensure there are no beans in flight
 			assertEquals("In flight bean count should be 0 but is not", 0, inFlightCount);
 		}
@@ -155,10 +162,12 @@ public class BeanCounterLogicTest {
 	public void testAdvanceStepCoordinates() {
 		// TODO: Implement
 		logic.reset(beans);
-		boolean done = logic.advanceStep();
-		while(!done)
+		
+		boolean running = true;
+		while(running)
 		{
-			done = logic.advanceStep();
+			running = logic.advanceStep();
+			
 			for(int i = 0; i < slotCount; i++)
 			{
 				int inFlightBeanXPos = logic.getInFlightBeanXPos(i);
