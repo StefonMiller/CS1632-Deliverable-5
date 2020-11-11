@@ -82,7 +82,6 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testReset() {
-		// TODO: Implement
 		/*
 		 * Currently, it just prints out the failString to demonstrate to you all the
 		 * cases considered by Java Path Finder. If you called the Verify API correctly
@@ -107,6 +106,7 @@ public class BeanCounterLogicTest {
 			
 			//Loop through slots
 			for (int i = 0; i < slotCount; i++) {
+				
 				//Each additional slot is another y level,
 				//so the number of levels is equal to the number of slots.
 				//If there is an in flight bean for the given X position, increment the counter
@@ -126,6 +126,7 @@ public class BeanCounterLogicTest {
 			
 			//Loop through slots
 			for (int i = 0; i < slotCount; i++) {
+				
 				//Each additional slot is another y level,
 				//so the number of levels is equal to the number of slots.
 				//If there is an in flight bean for the given X position, increment the counter
@@ -140,8 +141,6 @@ public class BeanCounterLogicTest {
 			//Ensure there are no beans in flight
 			assertEquals("In flight bean count should be 0 but is not", 0, inFlightCount);
 		}
-		
-		System.out.println(failString);
 	}
 
 	/**
@@ -154,7 +153,6 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testAdvanceStepCoordinates() {
-		// TODO: Implement
 		logic.reset(beans);
 		
 		boolean running = true;
@@ -182,7 +180,31 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testAdvanceStepBeanCount() {
-		// TODO: Implement
+		logic.reset(beans);
+		
+		int total = 0;
+		int inFlight = 0;
+		int inSlot = 0;
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+			
+			inFlight = 0;
+			inSlot = 0;
+			
+			for (int i = 0; i < slotCount; i++) {
+				if (logic.getInFlightBeanXPos(i) >= 0) {
+					inFlight++;
+				}
+				
+				inSlot += logic.getSlotBeanCount(i);
+			}
+			
+			total = logic.getRemainingBeanCount() + inFlight + inSlot;
+			assertEquals("Logic has incorrect number of total beans accounted for", beanCount, total);
+		}
 	}
 
 	/**
@@ -197,7 +219,29 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testAdvanceStepPostCondition() {
-		// TODO: Implement
+		logic.reset(beans);
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		int inFlight = 0;
+		int inSlot = 0;
+		
+		// Check all slots and x positions for beans
+		for (int i = 0; i < slotCount; i++) {
+			if (logic.getInFlightBeanXPos(i) >= 0) {
+				inFlight++;
+			}
+			
+			inSlot += logic.getSlotBeanCount(i);
+		}
+		
+		assertEquals("Remaining bean count is not zero", 0, logic.getRemainingBeanCount());
+		assertEquals("In-flight bean count is not zero", 0, inFlight);
+		assertEquals("In-slot bean count doesn't match total beans used", beanCount, inSlot);
 	}
 	
 	/**
@@ -213,7 +257,35 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testLowerHalf() {
-		// TODO: Implement
+		logic.reset(beans);
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		// If even: beanCount / 2
+		// If odd: (beanCount + 1) / 2
+		int expectedInSlot = (beanCount % 2 == 0 ? (beanCount / 2) : ((beanCount + 1) / 2));
+		int leftOverBeans = 0;
+		int currentSlot = 0;
+		
+		// Take lower half of beans only
+		logic.lowerHalf();
+		
+		// Check all slots for remaining beans
+		for (int i = 0; i < slotCount; i++) {
+			currentSlot = logic.getSlotBeanCount(i);
+			
+			if (leftOverBeans >= expectedInSlot) {
+				assertEquals("Too many beans: upper slots should be empty", 0, currentSlot);
+			} else {
+				leftOverBeans += currentSlot;
+			}
+		}
+		
+		assertEquals("Leftover beans should be half of the original count", expectedInSlot, leftOverBeans);
 	}
 	
 	/**
@@ -229,7 +301,36 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testUpperHalf() {
-		// TODO: Implement
+		logic.reset(beans);
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		// If even: beanCount / 2
+		// If odd: (beanCount + 1) / 2
+		int expectedInSlot = (beanCount % 2 == 0 ? (beanCount / 2) : ((beanCount + 1) / 2));
+		int leftOverBeans = 0;
+		int currentSlot = 0;
+		
+		// Take upper half of beans only
+		logic.upperHalf();
+		
+		// Check all slots for remaining beans
+		// starting from the upper-most slot
+		for (int i = slotCount - 1; i >= 0; i--) {
+			currentSlot = logic.getSlotBeanCount(i);
+			
+			if (leftOverBeans >= expectedInSlot) {
+				assertEquals("Too many beans: lower slots should be empty", 0, currentSlot);
+			} else {
+				leftOverBeans += currentSlot;
+			}
+		}
+		
+		assertEquals("Leftover beans should be half of the original count", expectedInSlot, leftOverBeans);
 	}
 	
 	/**
@@ -244,6 +345,35 @@ public class BeanCounterLogicTest {
 	 */
 	@Test
 	public void testRepeat() {
-		// TODO: Implement
+		logic.reset(beans);
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		int[] firstSlotCount = new int[slotCount];
+		
+		// Count beans in all slots
+		for (int i = 0; i < slotCount; i++) {
+			firstSlotCount[i] = logic.getSlotBeanCount(i);
+		}
+		
+		// Repeat above simulation results
+		logic.repeat();
+		
+		// Run simulation again until finished
+		running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		// Check beans in all slots against original
+		int newCount = 0;
+		for (int i = 0; i < slotCount; i++) {
+			newCount = logic.getSlotBeanCount(i);
+			assertEquals("Bean count in slot " + i + " was not the same", firstSlotCount[i], newCount);
+		}
 	}
 }
