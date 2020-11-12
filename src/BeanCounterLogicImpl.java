@@ -1,4 +1,7 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Formatter;
+import java.util.Queue;
 import java.util.Random;
 
 /**
@@ -29,11 +32,9 @@ import java.util.Random;
 public class BeanCounterLogicImpl implements BeanCounterLogic {
 	// TODO: Add member methods and variables as needed
 	int slots;
-	int remainingBeans;
-	Bean[] inFlightBeans;
-	Bean[] allBeans;
- 	int[] beansInSlot;
-	int currBean;
+	ArrayList<Bean> inFlightBeans;
+	ArrayList<Bean> remainingBeans;
+ 	ArrayList<ArrayList<Bean>> beansInSlot;
 	
 	/**
 	 * Constructor - creates the bean counter logic object that implements the core
@@ -43,9 +44,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	BeanCounterLogicImpl(int slotCount) {
 		slots = slotCount;
-		inFlightBeans = new Bean[slotCount];
-		beansInSlot = new int[slotCount];
-		beansInAllSlots = 0;
+		inFlightBeans = new ArrayList<Bean>(slotCount);
+		for (int i = 0; i < slotCount; i++) {
+			inFlightBeans.add(null);
+		}
+		beansInSlot = new ArrayList<ArrayList<Bean>>(slotCount);
 	}
 
 	/**
@@ -63,7 +66,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of beans remaining
 	 */
 	public int getRemainingBeanCount() {
-		return remainingBeans;
+		return remainingBeans.size();
 	}
 
 	/**
@@ -73,10 +76,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return the x-coordinate of the in-flight bean; if no bean in y-coordinate, return NO_BEAN_IN_YPOS
 	 */
 	public int getInFlightBeanXPos(int yPos) {
-		if (inFlightBeans[yPos] == null) {
+		
+		if (inFlightBeans.get(yPos) == null) {
 			return NO_BEAN_IN_YPOS;
 		}
-		return inFlightBeans[yPos].getXPos();
+		return inFlightBeans.get(yPos).getXPos();
 	}
 
 	/**
@@ -86,7 +90,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of beans in slot
 	 */
 	public int getSlotBeanCount(int i) {
-		return beansInSlot[i];
+		return beansInSlot.get(i).size();
 	}
 
 	/**
@@ -130,11 +134,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	public void reset(Bean[] beans) {
 		// TODO: Implement
-		allBeans = beans;
-		remainingBeans = allBeans.length - 1;
-		inFlightBeans[0] = allBeans[0];
-		currBean = 1;
-		
+		remainingBeans = new ArrayList<Bean>(Arrays.asList(beans));
+		for (int i = 0; i < slots; i++) {
+			beansInSlot.add(new ArrayList());
+		}
+		inFlightBeans.set(0, remainingBeans.remove(0));
 	}
 
 	/**
@@ -144,11 +148,14 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	public void repeat() {
 		// TODO: Implement
-		inFlightBeans = new Bean[slots];
-		beansInSlot = new int[slots];
-		beansInAllSlots = 0;
-		inFlightBeans[0] = allBeans[0];
-		currBean = 1;
+		remainingBeans.addAll(inFlightBeans);
+		inFlightBeans = new ArrayList<Bean>(slots);
+		for (int i = 0; i < slots; i++) {
+			remainingBeans.addAll(beansInSlot.get(i));
+			inFlightBeans.add(null);
+			beansInSlot.set(i, new ArrayList());
+		}
+		inFlightBeans.set(0, remainingBeans.remove(0));
 	}
 
 	/**
