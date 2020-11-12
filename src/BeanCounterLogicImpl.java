@@ -28,7 +28,12 @@ import java.util.Random;
 
 public class BeanCounterLogicImpl implements BeanCounterLogic {
 	// TODO: Add member methods and variables as needed
-	
+	int slots;
+	int remainingBeans;
+	Bean[] inFlightBeans;
+	Bean[] allBeans;
+ 	int[] beansInSlot;
+	int currBean;
 	
 	/**
 	 * Constructor - creates the bean counter logic object that implements the core
@@ -37,7 +42,10 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @param slotCount the number of slots in the machine
 	 */
 	BeanCounterLogicImpl(int slotCount) {
-		// TODO: Implement
+		slots = slotCount;
+		inFlightBeans = new Bean[slotCount];
+		beansInSlot = new int[slotCount];
+		beansInAllSlots = 0;
 	}
 
 	/**
@@ -46,8 +54,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of slots
 	 */
 	public int getSlotCount() {
-		// TODO: Implement
-		return 1;
+		return slots;
 	}
 	
 	/**
@@ -56,8 +63,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of beans remaining
 	 */
 	public int getRemainingBeanCount() {
-		// TODO: Implement
-		return 0;
+		return remainingBeans;
 	}
 
 	/**
@@ -67,8 +73,10 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return the x-coordinate of the in-flight bean; if no bean in y-coordinate, return NO_BEAN_IN_YPOS
 	 */
 	public int getInFlightBeanXPos(int yPos) {
-		// TODO: Implement
-		return NO_BEAN_IN_YPOS;
+		if (inFlightBeans[yPos] == null) {
+			return NO_BEAN_IN_YPOS;
+		}
+		return inFlightBeans[yPos].getXPos();
 	}
 
 	/**
@@ -78,8 +86,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of beans in slot
 	 */
 	public int getSlotBeanCount(int i) {
-		// TODO: Implement
-		return 0;
+		return beansInSlot[i];
 	}
 
 	/**
@@ -88,8 +95,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return Average slot number of all the beans in slots.
 	 */
 	public double getAverageSlotBeanCount() {
-		// TODO: Implement
-		return 0;
+		int beansInAllSlots = 0;
+		for (int i = 0; i < slots; i++) {
+			beansInAllSlots += getSlotBeanCount(i);
+		}
+		return beansInAllSlots / (double)slots;
 	}
 
 	/**
@@ -120,6 +130,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	public void reset(Bean[] beans) {
 		// TODO: Implement
+		allBeans = beans;
+		remainingBeans = allBeans.length - 1;
+		inFlightBeans[0] = allBeans[0];
+		currBean = 1;
+		
 	}
 
 	/**
@@ -129,6 +144,11 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	public void repeat() {
 		// TODO: Implement
+		inFlightBeans = new Bean[slots];
+		beansInSlot = new int[slots];
+		beansInAllSlots = 0;
+		inFlightBeans[0] = allBeans[0];
+		currBean = 1;
 	}
 
 	/**

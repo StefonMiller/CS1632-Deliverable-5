@@ -373,7 +373,9 @@ public class BeanCounterLogicTest {
 		int newCount = 0;
 		for (int i = 0; i < slotCount; i++) {
 			newCount = logic.getSlotBeanCount(i);
-			assertEquals("Bean count in slot " + i + " was not the same", firstSlotCount[i], newCount);
+			if (!isLuck) {
+				assertEquals("Bean count in slot " + i + " was not the same", firstSlotCount[i], newCount);
+			}
 		}
 	}
 }
