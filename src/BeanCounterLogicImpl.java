@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
@@ -32,9 +34,9 @@ import java.util.Random;
 public class BeanCounterLogicImpl implements BeanCounterLogic {
 	// TODO: Add member methods and variables as needed
 	int slots;
-	ArrayList<Bean> inFlightBeans;
+	HashMap<Integer, Bean> inFlightBeans;
 	ArrayList<Bean> remainingBeans;
- 	ArrayList<ArrayList<Bean>> beansInSlot;
+ 	HashMap<Integer, ArrayList<Bean>> beansInSlot;
 	
 	/**
 	 * Constructor - creates the bean counter logic object that implements the core
@@ -44,11 +46,8 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 */
 	BeanCounterLogicImpl(int slotCount) {
 		slots = slotCount;
-		inFlightBeans = new ArrayList<Bean>(slotCount);
-		for (int i = 0; i < slotCount; i++) {
-			inFlightBeans.add(null);
-		}
-		beansInSlot = new ArrayList<ArrayList<Bean>>(slotCount);
+		inFlightBeans = new HashMap<Integer, Bean>(slotCount);
+		beansInSlot = new HashMap<Integer, ArrayList<Bean>>(slotCount);
 	}
 
 	/**
@@ -90,6 +89,9 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return number of beans in slot
 	 */
 	public int getSlotBeanCount(int i) {
+		if (beansInSlot.get(i) == null) {
+			return 0;
+		}
 		return beansInSlot.get(i).size();
 	}
 
@@ -113,7 +115,30 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * will be remaining.
 	 */
 	public void upperHalf() {
-		// TODO: Implement
+		int totalSize = 0;
+		for (int i = 0; i < slots; i++) {
+			ArrayList<Bean> slot = beansInSlot.get(i);
+			if (slot != null) {
+				totalSize += slot.size();
+			}
+		}
+		int halfSize = (totalSize % 2 == 0 ? (totalSize / 2) : ((totalSize + 1) / 2));
+		int currCount = 0;
+		for (int j = 0; j < slots; j++) {
+			ArrayList<Bean> slot = beansInSlot.get(j);
+			if (slot != null) {
+				for (int k = 0; k < slot.size(); k++) {
+					if (currCount >= (totalSize - halfSize)) {
+						break;
+					}
+					else {
+						slot.remove(k);
+						currCount++;
+					}
+				}
+			}
+		}
+		
 	}
 
 	/**
@@ -123,7 +148,29 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * will be remaining.
 	 */
 	public void lowerHalf() {
-		// TODO: Implement
+		int totalSize = 0;
+		for (int i = 0; i < slots; i++) {
+			ArrayList<Bean> slot = beansInSlot.get(i);
+			if (slot != null) {
+				totalSize += slot.size();
+			}
+		}
+		int halfSize = (totalSize % 2 == 0 ? (totalSize / 2) : ((totalSize + 1) / 2));
+		int currCount = 0;
+		for (int j = slots - 1; j >= 0; j--) {
+			ArrayList<Bean> slot = beansInSlot.get(j);
+			if (slot != null) {
+				for (int k = 0; k < slot.size(); k++) {
+					if (currCount >= (totalSize - halfSize)) {
+						break;
+					}
+					else {
+						slot.remove(k);
+						currCount++;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -133,12 +180,18 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @param beans array of beans to add to the machine
 	 */
 	public void reset(Bean[] beans) {
-		// TODO: Implement
-		remainingBeans = new ArrayList<Bean>(Arrays.asList(beans));
-		for (int i = 0; i < slots; i++) {
-			beansInSlot.add(new ArrayList());
+		// Reset all beans
+		for (Bean b : beans) {
+			b.reset();
 		}
-		inFlightBeans.set(0, remainingBeans.remove(0));
+		// Create new arraylist with bean array
+		remainingBeans = new ArrayList<Bean>(Arrays.asList(beans));
+		// Initialize new hashmap for beansinslot
+		beansInSlot = new HashMap<Integer, ArrayList<Bean>>(slots);
+		// Initialize new hashmap for beansinflight
+		inFlightBeans = new HashMap<Integer, Bean>(slots); 
+		// Put a bean at the top
+		inFlightBeans.put(0, remainingBeans.remove(0));
 	}
 
 	/**
@@ -147,15 +200,24 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * beginning, the machine starts with one bean at the top.
 	 */
 	public void repeat() {
-		// TODO: Implement
-		remainingBeans.addAll(inFlightBeans);
-		inFlightBeans = new ArrayList<Bean>(slots);
 		for (int i = 0; i < slots; i++) {
-			remainingBeans.addAll(beansInSlot.get(i));
-			inFlightBeans.add(null);
-			beansInSlot.set(i, new ArrayList());
+			Bean currBean;
+			// Add all in flight beans to the remaining beans
+			if (inFlightBeans.get(i) != null) {
+				currBean = inFlightBeans.remove(i);
+				currBean.reset();
+				remainingBeans.add(currBean);
+			}
+			// Add all in slot beans to the remaining pool
+			ArrayList<Bean> slot = beansInSlot.get(i);
+			if (slot != null) {
+				for (int j = 0; j < slot.size(); j++) {
+					currBean = slot.remove(j);
+					currBean.reset();
+					remainingBeans.add(currBean);
+				}
+			}
 		}
-		inFlightBeans.set(0, remainingBeans.remove(0));
 	}
 
 	/**
@@ -167,7 +229,37 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 *         means the machine is finished.
 	 */
 	public boolean advanceStep() {
-		// TODO: Implement
+		if (!(inFlightBeans.isEmpty() && remainingBeans.isEmpty())) {
+			for (int i = slots - 1; i >= 0; i--) {
+				Bean currBean = inFlightBeans.remove(i);
+				if (currBean != null) {
+					if (i == (slots - 1)) {
+						// Move the bean right above the slots to the slot corresponding to it's x position
+						ArrayList<Bean> slot = beansInSlot.get(currBean.getXPos());
+						// If the slot is null, then there are no beans in it and we need to initialize it
+						if (slot == null) {
+							slot = new ArrayList<Bean>();
+							slot.add(currBean);
+							beansInSlot.put(currBean.getXPos(), slot);
+						}
+						else {
+							slot.add(currBean);
+						}
+					}
+					else {
+						// Have beans choose their next position if they are not at the very bottom
+						currBean.choose();
+						// If not at the end, increment the y position of each bean in flight
+						inFlightBeans.put(i + 1, currBean);
+					}	
+				}
+			}
+			// Add an additional bean to the top if there is one remaining
+			if (!remainingBeans.isEmpty()) {
+				inFlightBeans.put(0, remainingBeans.remove(0));
+			}	
+			return true;
+		}
 		return false;
 	}
 	

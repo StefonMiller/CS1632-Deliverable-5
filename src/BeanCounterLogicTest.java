@@ -378,4 +378,31 @@ public class BeanCounterLogicTest {
 			}
 		}
 	}
+	
+	/**
+	 * Test case for void repeat().
+	 * Preconditions: None.
+	 * Execution steps: Call logic.reset(beans).
+	 *                  Call logic.advanceStep() in a loop until it returns false (the machine terminates).
+	 *                  Call logic.repeat();
+	 *                  Call logic.advanceStep() in a loop until it returns false (the machine terminates).
+	 * Invariants: The number of remaining beans after reset(beans) should be the same as after repeat()
+	 */
+	@Test
+	public void testRepeatSize() {
+		logic.reset(beans);
+		int resetBeans = logic.getRemainingBeanCount();
+		
+		// Run simulation until finished
+		boolean running = true;
+		while (running) {
+			running = logic.advanceStep();
+		}
+		
+		// Repeat above simulation results
+		logic.repeat();
+		int repeatBeans = logic.getRemainingBeanCount();
+		
+		assertEquals("Bean count not the same after calling reset", resetBeans, repeatBeans);
+	}
 }
