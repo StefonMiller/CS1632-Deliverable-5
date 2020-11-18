@@ -133,7 +133,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		for (int j = 0; j < slots; j++) {
 			ArrayList<Bean> slot = beansInSlot.get(j);
 			if (slot != null) {
-				while (currCount < (totalSize - halfSize)) {
+				while (currCount < (totalSize - halfSize) && !slot.isEmpty()) {
 					slot.remove(0);
 					currCount++;
 				}
@@ -161,7 +161,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		for (int j = slots - 1; j >= 0; j--) {
 			ArrayList<Bean> slot = beansInSlot.get(j);
 			if (slot != null) {
-				while (currCount < (totalSize - halfSize)) {
+				while (currCount < (totalSize - halfSize) && !slot.isEmpty()) {
 					slot.remove(0);
 					currCount++;
 				}

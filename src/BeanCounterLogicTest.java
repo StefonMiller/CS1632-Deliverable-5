@@ -32,8 +32,8 @@ public class BeanCounterLogicTest {
 	@BeforeClass
 	public static void setUp() {
 		if (Config.getTestType() == TestType.JUNIT) {
-			slotCount = 5;
-			beanCount = 3;
+			slotCount = 10;
+			beanCount = 20;
 			isLuck = true;
 		} else if (Config.getTestType() == TestType.JPF_ON_JUNIT) {
 			/*
@@ -301,7 +301,7 @@ public class BeanCounterLogicTest {
 				// the number of beans needed to reach the expected amount
 				if (leftOverBeans >= expectedInSlot) {
 					assertEquals("Wrong number of overflow beans in slot " + i,
-							currentSlot, preHalfSlotCounts[i] - beansNeeded);
+							beansNeeded, currentSlot);
 				} else {
 					
 					// Otherwise, the number of beans in this slot should be
@@ -372,7 +372,7 @@ public class BeanCounterLogicTest {
 				// the number of beans needed to reach the expected amount
 				if (leftOverBeans >= expectedInSlot) {
 					assertEquals("Wrong number of overflow beans in slot " + i,
-							currentSlot, preHalfSlotCounts[i] - beansNeeded);
+							beansNeeded, currentSlot);
 				} else {
 					
 					// Otherwise, the number of beans in this slot should be
@@ -457,6 +457,6 @@ public class BeanCounterLogicTest {
 		logic.repeat();
 		int repeatBeans = logic.getRemainingBeanCount();
 		
-		assertEquals(" Bean count not the same after calling reset", resetBeans, repeatBeans);
+		assertEquals("Bean count not the same after calling reset", resetBeans, repeatBeans);
 	}
 }
