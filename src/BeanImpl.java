@@ -31,7 +31,6 @@ public class BeanImpl implements Bean {
 	// TODO: Add more member variables as needed
 	private int xpos;
 	private boolean luck;
-	private int slots;
 	private int skillLevel;
 	Random r;
 	
@@ -46,7 +45,6 @@ public class BeanImpl implements Bean {
 		
 		luck = isLuck;
 		r = rand;
-		slots = slotCount;
 		if (!luck) {
 			double skillAverage = (double) (slotCount - 1) * 0.5;
 			double skillStdDev = (double) Math.sqrt(slotCount * 0.5 * (1 - 0.5));

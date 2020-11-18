@@ -32,8 +32,8 @@ public class BeanCounterLogicTest {
 	@BeforeClass
 	public static void setUp() {
 		if (Config.getTestType() == TestType.JUNIT) {
-			slotCount = 5;
-			beanCount = 3;
+			slotCount = 10;
+			beanCount = 20;
 			isLuck = true;
 		} else if (Config.getTestType() == TestType.JPF_ON_JUNIT) {
 			/*
@@ -55,7 +55,7 @@ public class BeanCounterLogicTest {
 		// Create the beans
 		beans = new Bean[beanCount];
 		for (int i = 0; i < beanCount; i++) {
-			beans[i] = Bean.createInstance(slotCount, isLuck, new Random(42));
+			beans[i] = Bean.createInstance(slotCount, isLuck, new Random());
 		}
 
 		// A failstring useful to pass to assertions to get a more descriptive error.
@@ -269,7 +269,15 @@ public class BeanCounterLogicTest {
 		// If odd: (beanCount + 1) / 2
 		int expectedInSlot = (beanCount % 2 == 0 ? (beanCount / 2) : ((beanCount + 1) / 2));
 		int leftOverBeans = 0;
+		int beansNeeded = 0;
 		int currentSlot = 0;
+		
+		int[] preHalfSlotCounts = new int[slotCount];
+		
+		// Record slot counts before taking lowerHalf()
+		for(int i = 0; i < slotCount; i++) {
+			preHalfSlotCounts[i] = logic.getSlotBeanCount(i);
+		}
 		
 		// Take lower half of beans only
 		logic.lowerHalf();
@@ -278,10 +286,29 @@ public class BeanCounterLogicTest {
 		for (int i = 0; i < slotCount; i++) {
 			currentSlot = logic.getSlotBeanCount(i);
 			
+			// If all leftover beans have been counted, the rest of the slots should be empty
 			if (leftOverBeans >= expectedInSlot) {
 				assertEquals("Too many beans: upper slots should be empty", 0, currentSlot);
 			} else {
+				
+				// Add to the leftover bean count
+				beansNeeded = expectedInSlot - leftOverBeans;
 				leftOverBeans += currentSlot;
+				
+				// Check for overflow:
+				// beans left in this slot should be
+				// the pre-half slot count, minus
+				// the number of beans needed to reach the expected amount
+				if (leftOverBeans >= expectedInSlot) {
+					assertEquals("Wrong number of overflow beans in slot " + i,
+							currentSlot, preHalfSlotCounts[i] - beansNeeded);
+				} else {
+					
+					// Otherwise, the number of beans in this slot should be
+					// the same as it was previously
+					assertEquals("Wrong number of beans in slot " + i, 
+							preHalfSlotCounts[i], currentSlot);
+				}
 			}
 		}
 		
@@ -313,7 +340,15 @@ public class BeanCounterLogicTest {
 		// If odd: (beanCount + 1) / 2
 		int expectedInSlot = (beanCount % 2 == 0 ? (beanCount / 2) : ((beanCount + 1) / 2));
 		int leftOverBeans = 0;
+		int beansNeeded = 0;
 		int currentSlot = 0;
+		
+		int[] preHalfSlotCounts = new int[slotCount];
+		
+		// Record slot counts before taking upperHalf()
+		for(int i = 0; i < slotCount; i++) {
+			preHalfSlotCounts[i] = logic.getSlotBeanCount(i);
+		}
 		
 		// Take upper half of beans only
 		logic.upperHalf();
@@ -326,7 +361,25 @@ public class BeanCounterLogicTest {
 			if (leftOverBeans >= expectedInSlot) {
 				assertEquals("Too many beans: lower slots should be empty", 0, currentSlot);
 			} else {
+				
+				// Add to the leftover bean count
+				beansNeeded = expectedInSlot - leftOverBeans;
 				leftOverBeans += currentSlot;
+				
+				// Check for overflow:
+				// beans left in this slot should be
+				// the pre-half slot count, minus
+				// the number of beans needed to reach the expected amount
+				if (leftOverBeans >= expectedInSlot) {
+					assertEquals("Wrong number of overflow beans in slot " + i,
+							currentSlot, preHalfSlotCounts[i] - beansNeeded);
+				} else {
+					
+					// Otherwise, the number of beans in this slot should be
+					// the same as it was previously
+					assertEquals("Wrong number of beans in slot " + i, 
+							preHalfSlotCounts[i], currentSlot);
+				}
 			}
 		}
 		
