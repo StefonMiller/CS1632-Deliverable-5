@@ -32,8 +32,8 @@ public class BeanCounterLogicTest {
 	@BeforeClass
 	public static void setUp() {
 		if (Config.getTestType() == TestType.JUNIT) {
-			slotCount = 10;
-			beanCount = 20;
+			slotCount = 5;
+			beanCount = 3;
 			isLuck = true;
 		} else if (Config.getTestType() == TestType.JPF_ON_JUNIT) {
 			/*
@@ -55,7 +55,7 @@ public class BeanCounterLogicTest {
 		// Create the beans
 		beans = new Bean[beanCount];
 		for (int i = 0; i < beanCount; i++) {
-			beans[i] = Bean.createInstance(slotCount, isLuck, new Random());
+			beans[i] = Bean.createInstance(slotCount, isLuck, new Random(42));
 		}
 
 		// A failstring useful to pass to assertions to get a more descriptive error.

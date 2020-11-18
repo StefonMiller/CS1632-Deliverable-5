@@ -133,13 +133,9 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		for (int j = 0; j < slots; j++) {
 			ArrayList<Bean> slot = beansInSlot.get(j);
 			if (slot != null) {
-				for (int k = 0; k < slot.size(); k++) {
-					if (currCount >= (totalSize - halfSize)) {
-						break;
-					} else {
-						slot.remove(k);
-						currCount++;
-					}
+				while (currCount < (totalSize - halfSize)) {
+					slot.remove(0);
+					currCount++;
 				}
 			}
 		}
@@ -165,13 +161,9 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		for (int j = slots - 1; j >= 0; j--) {
 			ArrayList<Bean> slot = beansInSlot.get(j);
 			if (slot != null) {
-				for (int k = 0; k < slot.size(); k++) {
-					if (currCount >= (totalSize - halfSize)) {
-						break;
-					} else {
-						slot.remove(k);
-						currCount++;
-					}
+				while (currCount < (totalSize - halfSize)) {
+					slot.remove(0);
+					currCount++;
 				}
 			}
 		}
