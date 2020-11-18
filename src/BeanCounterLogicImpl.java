@@ -130,8 +130,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 				for (int k = 0; k < slot.size(); k++) {
 					if (currCount >= (totalSize - halfSize)) {
 						break;
-					}
-					else {
+					} else {
 						slot.remove(k);
 						currCount++;
 					}
@@ -163,8 +162,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 				for (int k = 0; k < slot.size(); k++) {
 					if (currCount >= (totalSize - halfSize)) {
 						break;
-					}
-					else {
+					} else {
 						slot.remove(k);
 						currCount++;
 					}
@@ -239,22 +237,24 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 				Bean currBean = inFlightBeans.remove(i);
 				if (currBean != null) {
 					if (i == (slots - 1)) {
-						// Move the bean right above the slots to the slot corresponding to it's x position
+						// Move the bean right above the slots 
+						// to the slot corresponding to it's x position
 						ArrayList<Bean> slot = beansInSlot.get(currBean.getXPos());
-						// If the slot is null, then there are no beans in it and we need to initialize it
+						// If the slot is null, then there are no beans 
+						// in it and we need to initialize it
 						if (slot == null) {
 							slot = new ArrayList<Bean>();
 							slot.add(currBean);
 							beansInSlot.put(currBean.getXPos(), slot);
-						}
-						else {
+						} else {
 							slot.add(currBean);
 						}
-					}
-					else {
-						// Have beans choose their next position if they are not at the very bottom
+					} else {
+						// Have beans choose their next 
+						// position if they are not at the very bottom
 						currBean.choose();
-						// If not at the end, increment the y position of each bean in flight
+						// If not at the end, increment the y 
+						// position of each bean in flight
 						inFlightBeans.put(i + 1, currBean);
 					}	
 				}

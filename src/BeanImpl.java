@@ -34,6 +34,7 @@ public class BeanImpl implements Bean {
 	private int slots;
 	private int skillLevel;
 	Random r;
+	
 	/**
 	 * Constructor - creates a bean in either luck mode or skill mode.
 	 * 
@@ -42,14 +43,14 @@ public class BeanImpl implements Bean {
 	 * @param rand		the random number generator
 	 */
 	BeanImpl(int slotCount, boolean isLuck, Random rand) {
-		// TODO: Implement
+		
 		luck = isLuck;
 		r = rand;
 		slots = slotCount;
 		if (!luck) {
-			double skillAverage = (double)(slotCount - 1) * 0.5;
-			double skillStdDev = (double)Math.sqrt(slotCount * 0.5 * (1 - 0.5));
-			skillLevel = (int)Math.round(r.nextGaussian() * skillStdDev + skillAverage);
+			double skillAverage = (double) (slotCount - 1) * 0.5;
+			double skillStdDev = (double) Math.sqrt(slotCount * 0.5 * (1 - 0.5));
+			skillLevel = (int) Math.round(r.nextGaussian() * skillStdDev + skillAverage);
 		}
 	}
 	
@@ -81,18 +82,12 @@ public class BeanImpl implements Bean {
 		//We do not need to decrement xpos as each bean starts at 0
 		if (luck) {
 			int choice = r.nextInt();
-			if (choice == 0) {
-				
-			}
-			else {
+			if (choice != 0) {
 				xpos++;
 			}
 		} else {
 			if (xpos < skillLevel) {
 				xpos++;
-			}
-			else {
-				
 			}
 		}
 	}
