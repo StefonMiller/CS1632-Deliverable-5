@@ -275,7 +275,7 @@ public class BeanCounterLogicTest {
 		int[] preHalfSlotCounts = new int[slotCount];
 		
 		// Record slot counts before taking lowerHalf()
-		for(int i = 0; i < slotCount; i++) {
+		for (int i = 0; i < slotCount; i++) {
 			preHalfSlotCounts[i] = logic.getSlotBeanCount(i);
 		}
 		
@@ -346,7 +346,7 @@ public class BeanCounterLogicTest {
 		int[] preHalfSlotCounts = new int[slotCount];
 		
 		// Record slot counts before taking upperHalf()
-		for(int i = 0; i < slotCount; i++) {
+		for (int i = 0; i < slotCount; i++) {
 			preHalfSlotCounts[i] = logic.getSlotBeanCount(i);
 		}
 		
