@@ -105,7 +105,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		for (int i = 0; i < slots; i++) {
 			beansInAllSlots += getSlotBeanCount(i);
 		}
-		return beansInAllSlots / (double)slots;
+		return beansInAllSlots / (double) slots;
 	}
 
 	/**
@@ -186,12 +186,17 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		}
 		// Create new arraylist with bean array
 		remainingBeans = new ArrayList<Bean>(Arrays.asList(beans));
+		
 		// Initialize new hashmap for beansinslot
 		beansInSlot = new HashMap<Integer, ArrayList<Bean>>(slots);
+		
 		// Initialize new hashmap for beansinflight
 		inFlightBeans = new HashMap<Integer, Bean>(slots); 
+		
 		// Put a bean at the top
-		inFlightBeans.put(0, remainingBeans.remove(0));
+		if (beans.length > 0) {
+			inFlightBeans.put(0, remainingBeans.remove(0));
+		}
 	}
 
 	/**
