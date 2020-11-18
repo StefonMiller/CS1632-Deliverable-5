@@ -81,7 +81,7 @@ public class BeanImpl implements Bean {
 		//If luck, only increment xPos if random.nextInt is not 0
 		//We do not need to decrement xpos as each bean starts at 0
 		if (luck) {
-			int choice = r.nextInt();
+			int choice = r.nextInt(2);
 			if (choice != 0) {
 				xpos++;
 			}

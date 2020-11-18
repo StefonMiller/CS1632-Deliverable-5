@@ -101,11 +101,17 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	 * @return Average slot number of all the beans in slots.
 	 */
 	public double getAverageSlotBeanCount() {
-		int beansInAllSlots = 0;
+		double beansInAllSlots = 0.0;
+		double totalValue = 0.0;
+		
 		for (int i = 0; i < slots; i++) {
+			totalValue += getSlotBeanCount(i) * i;
 			beansInAllSlots += getSlotBeanCount(i);
 		}
-		return beansInAllSlots / (double) slots;
+		
+		double average = totalValue / beansInAllSlots;
+		
+		return (beansInAllSlots == 0 ? 0 : average);
 	}
 
 	/**
@@ -189,7 +195,7 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 		beansInSlot = new HashMap<Integer, ArrayList<Bean>>(slots);
 		
 		// Initialize new hashmap for beansinflight
-		inFlightBeans = new HashMap<Integer, Bean>(slots); 
+		inFlightBeans = new HashMap<Integer, Bean>(slots);
 		
 		// Put a bean at the top
 		if (beans.length > 0) {
@@ -205,21 +211,29 @@ public class BeanCounterLogicImpl implements BeanCounterLogic {
 	public void repeat() {
 		for (int i = 0; i < slots; i++) {
 			Bean currBean;
+			
 			// Add all in flight beans to the remaining beans
 			if (inFlightBeans.get(i) != null) {
 				currBean = inFlightBeans.remove(i);
 				currBean.reset();
 				remainingBeans.add(currBean);
 			}
+			
 			// Add all in slot beans to the remaining pool
 			ArrayList<Bean> slot = beansInSlot.get(i);
 			if (slot != null) {
-				for (int j = 0; j < slot.size(); j++) {
-					currBean = slot.remove(j);
-					currBean.reset();
-					remainingBeans.add(currBean);
+				for (Bean b : slot) {
+					b.reset();
+					remainingBeans.add(b);
 				}
+				
+				slot.clear();
 			}
+		}
+		
+		// Put a bean at the top
+		if (remainingBeans.size() > 0) {
+			inFlightBeans.put(0, remainingBeans.remove(0));
 		}
 	}
 

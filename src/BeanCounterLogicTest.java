@@ -389,7 +389,7 @@ public class BeanCounterLogicTest {
 	 *                  Call logic.advanceStep() in a loop until it returns false (the machine terminates).
 	 * Invariants: The number of remaining beans after reset(beans) should be the same as after repeat()
 	 */
-	//@Test
+	@Test
 	public void testRepeatSize() {
 		logic.reset(beans);
 		int resetBeans = logic.getRemainingBeanCount();
@@ -404,6 +404,6 @@ public class BeanCounterLogicTest {
 		logic.repeat();
 		int repeatBeans = logic.getRemainingBeanCount();
 		
-		assertEquals("Bean count not the same after calling reset", resetBeans, repeatBeans);
+		assertEquals(" Bean count not the same after calling reset", resetBeans, repeatBeans);
 	}
 }
